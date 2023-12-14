@@ -234,7 +234,7 @@ with coll1.container():
     st.plotly_chart(fig, use_container_width=True)
 
 with coll2.container():
-    st.subheader(f"Projection 2030 de la consommation éléctrique partant d'un jeux de donnée de 2009 à 2019")
+    st.subheader(f"Projection 2030 de la consommation éléctrique partant d'un jeux de donnée de 2012 à 2019")
 # Afficher les deux cartes dans une même ligne
     # Afficher le graphique
     # Créer une figure Matplotlib
