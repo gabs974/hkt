@@ -5,9 +5,9 @@ import pandas as pd
 
 
 # @st.cache_data
-def fetch_data_from_api(url: str, offset: int, limit: int) -> dict:
-    params = {'limit': limit, 'offset': offset}
-    response = requests.get(url, params=params)
+def fetch_data_from_api(url: str) -> dict:
+    #params = {'limit': limit, 'offset': offset}
+    response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
         return data
@@ -23,7 +23,7 @@ def fetch_all_data(url: str) -> pd.DataFrame:
     total_records = None
 
     while total_records is None or offset < total_records:
-        data = fetch_data_from_api(url, offset, limit)
+        data = fetch_data_from_api(url)
         all_data.extend(data['results'])
 
         if total_records is None:
