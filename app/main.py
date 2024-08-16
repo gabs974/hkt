@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from api import population, df_population_codcom, df_conso_edf_codcom
 import plotly.express as px
-import random  # Ajout de l'importation du module random
+#import random  # Ajout de l'importation du module random
 #import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 
