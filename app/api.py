@@ -20,71 +20,24 @@ def fetch_all_data(url: str) -> pd.DataFrame:
     
     return df
 
-# Fonction pour lire les fichiers Excel et les convertir en DataFrame
-def fetch_excel_data(filepath: str) -> pd.DataFrame:
-    try:
-        df = pd.read_excel(filepath)
-        return df
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier Excel : {e}")
-        return pd.DataFrame()
-
-# Récupération des données de population à partir du fichier Excel
+# Récupération des données de population
 try:
-    filepath_population = "population-francaise-communespublic.xlsx"
-    population = fetch_excel_data(filepath_population)
-    
-    # Nettoyage des noms de colonnes
-    population.columns = population.columns.astype(str).str.strip().str.replace(' ', '_')
-    
+    url_population = "https://data.regionreunion.com/api/explore/v2.1/catalog/datasets/population-francaise-communespublic/records?limit=100&refine=nom_de_la_region%3A%22La%20R%C3%A9union%22"
+    population = fetch_all_data(url_population)
+    print("Données de population récupérées avec succès.")
 except Exception as e:
-    print(f"Erreur lors du traitement des données de population : {e}")
-    
-# Renommer les colonnes pour qu'elles correspondent à celles de l'API
-population.rename(columns={
-    'Code_région': 'code_region',
-    'Nom_de_la_région': 'nom_de_la_region',
-    'Code_département': 'code_departement',
-    'Code_arrondissement_départemental': 'code_arrondissement',
-    'Code_canton': 'code_canton',
-    'Code_commune': 'code_commune',
-    'Nom_de_la_commune': 'nom_de_la_commune',
-    'Population_municipale': 'population_municipale',
-    'Population_comptée_à_part': 'population_comptee_a_part',
-    'Population_totale': 'population_totale',
-    'Année_recensement': 'annee_recensement',
-    'Année_utilisation': 'annee_utilisation',
-    'Code_INSEE_(commune_ou_arrondissement)': 'code_insee_commune_ou_arrondissement',
-    'Superficie_de_la_commune': 'superficie_commune',
-    'Statut': 'statut',
-    'Code_INSEE_de_la_commune': 'code_insee_commune',
-    'Nom_de_la_commune_IGN': 'nom_commune_ign',
-    'Nom_du_département_IGN': 'nom_departement_ign',
-    'Nom_de_la_région': 'nom_region',
-    'Code_EPCI': 'code_epci',
-    'EPCI': 'epci'
-}, inplace=True)
+    print(f"Erreur lors de la récupération des données de population : {e}")
 
-# Récupération des données de consommation d'énergie à partir du fichier Excel
+# Récupération des données de consommation d'énergie
 try:
-    filepath_conso_nrj = "consommation-annuelle-par-commune0.xlsx"
-    conso_nrj = fetch_excel_data(filepath_conso_nrj)
-    
-    # Nettoyage des noms de colonnes
-    conso_nrj.columns = conso_nrj.columns.astype(str).str.strip().str.replace(' ', '_')
-    
-    # Renommer les colonnes pour qu'elles correspondent à celles de l'API
-    conso_nrj.rename(columns={
-        'nb_ligne': 'nb_ligne',
-        'Commune': 'commune',
-        'annee': 'annee',
-        'Code_INSEE': 'code_insee',
-        'Secteur': 'secteur',
-        'Consommation_(MWh)': 'consommation_mwh',
-        'Nombre_de_PDS': 'nombre_pds'
-    }, inplace=True)
+    url_conso_nrj = "https://opendata-reunion.edf.fr/api/explore/v2.1/catalog/datasets/consommation-annuelle-par-commune0/records?limit=100"
+    conso_nrj = fetch_all_data(url_conso_nrj)
+    print("Données de consommation d'énergie récupérées avec succès.")
 except Exception as e:
-    print(f"Erreur lors du traitement des données de consommation d'énergie : {e}")
+    print(f"Erreur lors de la récupération des données de consommation d'énergie : {e}")
+
+# À ce stade, vérifiez que les colonnes `annee_utilisation` et `population_totale` existent réellement
+# dans le DataFrame `population`, sinon ajustez la structure des données en conséquence.
 
 # Agrégation des données de population par année
 if "annee_utilisation" in population.columns:
@@ -92,28 +45,26 @@ if "annee_utilisation" in population.columns:
                      .sum()
                     )
     df_population = df_population.rename(columns={"annee_utilisation": "annee"})
-    df_population["annee"] = df_population["annee"].astype(str)  # Conversion en chaîne de caractères
 else:
     print("La colonne 'annee_utilisation' n'existe pas dans le DataFrame 'population'.")
-    df_population = pd.DataFrame()  # Créer un DataFrame vide pour éviter les erreurs plus tard
 
 # Agrégation des données de consommation d'énergie par année
 if "annee" in conso_nrj.columns:
     df_conso = (conso_nrj.groupby("annee", as_index=False)["consommation_mwh"]
                 .sum()
                )
-    df_conso["annee"] = df_conso["annee"].astype(str)  # Conversion en chaîne de caractères
+    df_conso["annee"] = df_conso["annee"].astype(str)
 else:
     print("La colonne 'annee' n'existe pas dans le DataFrame 'conso_nrj'.")
-    df_conso = pd.DataFrame()  # Créer un DataFrame vide pour éviter les erreurs plus tard
 
 # Fusion des DataFrames population et consommation d'énergie sur la colonne 'annee'
-if not df_population.empty and not df_conso.empty:
+if "annee" in df_population.columns and "annee" in df_conso.columns:
     population_merged = pd.merge(df_population, df_conso, on="annee", how="inner")
+
     # Sauvegarde des résultats fusionnés dans un fichier CSV
     population_merged.to_csv('resultat_fusion.csv', index=False)
 else:
-    print("La fusion des DataFrames n'a pas été possible car un des DataFrames est vide.")
+    print("La fusion des DataFrames n'a pas été possible car la colonne 'annee' est manquante.")
 
 # Création du DataFrame populations avec clé unique code_commune
 if "code_insee_commune" in population.columns:
