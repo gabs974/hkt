@@ -108,7 +108,7 @@ def estimate_population(year):
     # Remplacez cette fonction par votre propre logique d'estimation
     # Pour cet exemple, on suppose une croissance linéaire de la population
     initial_population = X['population_totale'].iloc[0]
-    population_growth_rate = 0.007  # exemple de taux de croissance de 2% par an
+    population_growth_rate = 0.027  # exemple de taux de croissance de 2% par an
     estimated_population = initial_population * (1 + population_growth_rate) ** (year - 2012)
     return estimated_population
 

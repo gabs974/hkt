@@ -22,7 +22,7 @@ def fetch_all_data(url: str) -> pd.DataFrame:
 
 # Récupération des données de population
 try:
-    url_population = "https://data.regionreunion.com/api/explore/v2.1/catalog/datasets/population-francaise-communespublic/records?refine=nom_de_la_region%3A%22La%20R%C3%A9union%22"
+    url_population = "https://data.regionreunion.com/api/explore/v2.1/catalog/datasets/population-francaise-communespublic/records?limit=100&refine=nom_de_la_region%3A%22La%20R%C3%A9union%22"
     population = fetch_all_data(url_population)
     print("Données de population récupérées avec succès.")
 except Exception as e:
@@ -30,7 +30,7 @@ except Exception as e:
 
 # Récupération des données de consommation d'énergie
 try:
-    url_conso_nrj = "https://opendata-reunion.edf.fr/api/explore/v2.1/catalog/datasets/consommation-annuelle-par-commune0/records"
+    url_conso_nrj = "https://opendata-reunion.edf.fr/api/explore/v2.1/catalog/datasets/consommation-annuelle-par-commune0/records?limit=100"
     conso_nrj = fetch_all_data(url_conso_nrj)
     print("Données de consommation d'énergie récupérées avec succès.")
 except Exception as e:
