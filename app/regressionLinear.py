@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 #import matplotlib.pyplot as plt
 #from api import population
-df_calc_population = pd.read_csv('resultat_fusion.csv', sep=",", na_values="-")
+df_calc_population = pd.read_csv('./app/resultat_fusion.csv', sep=",", na_values="-")
 
 # Sélectionnez les colonnes pertinentes
 data = df_calc_population[['annee', 'population_totale', 'consommation_mwh']]
